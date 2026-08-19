@@ -20,10 +20,11 @@ public class AssignedUser {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @OneToMany(mappedBy = "assignedUser")
+    @OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
     private List<Task> tasks;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private Project project;
 
     protected AssignedUser() {

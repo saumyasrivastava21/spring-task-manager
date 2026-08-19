@@ -29,9 +29,11 @@ public class Task {
     private LocalDateTime deadLine;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_user_id")
     private AssignedUser assignedUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private Project project;
 
     @Enumerated(EnumType.STRING)
