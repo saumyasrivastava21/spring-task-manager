@@ -1,7 +1,12 @@
 package com.example.spring_task_manager.entity;
 
 import jakarta.persistence.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -17,22 +22,31 @@ public class AssignedUser {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @OneToMany(mappedBy = "assignedUser")
+    @OneToMany(mappedBy = "assignedUser", fetch = FetchType.LAZY)
     private List<Task> tasks;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private Project project;
 
     protected AssignedUser() {
     }
 
-    public AssignedUser(String firstName, String email, Position position) {
+    public AssignedUser(String firstName, String password, String email, Position position) {
         this.firstName = firstName;
         this.email = email;
         this.position = position;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public Long getId() {
@@ -77,6 +91,10 @@ public class AssignedUser {
 
     public Project getProject() {
         return project;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setProject(Project project) {

@@ -16,9 +16,9 @@ public class Project {
     private String name;
     @Column(nullable = false)
     private String description;
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch=FetchType.LAZY)
     private List<AssignedUser> assignedUsers = new ArrayList<>();
 
     public Project(String name, String description) {
