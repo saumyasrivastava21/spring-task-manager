@@ -1,12 +1,17 @@
 package com.example.spring_task_manager.entity;
 
 import jakarta.persistence.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class AssignedUser {
+public class AssignedUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,6 +21,9 @@ public class AssignedUser {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Position position;
@@ -30,10 +38,26 @@ public class AssignedUser {
     protected AssignedUser() {
     }
 
-    public AssignedUser(String firstName, String email, Position position) {
+    public AssignedUser(String firstName, String password, String email, Position position) {
         this.firstName = firstName;
         this.email = email;
         this.position = position;
+        this.password = password;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(getPosition());
+    }
+
+    @Override
+    public @Nullable String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
     }
 
     public Long getId() {
@@ -80,7 +104,13 @@ public class AssignedUser {
         return project;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setProject(Project project) {
         this.project = project;
     }
+
+
 }
