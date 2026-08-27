@@ -1,5 +1,6 @@
 package com.example.spring_task_manager.config;
 
+import com.example.spring_task_manager.entity.Position;
 import com.example.spring_task_manager.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,18 +24,19 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        var roleAdmin = "ADMIN";
+        var roleManager = Position.MANAGER;
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET,
                                 "/api/projects",
                                 "/api/tasks")
                             .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users")
-                            .hasRole(roleAdmin)
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST, "/api/users")
-                            .hasRole(roleAdmin)
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/users/*",
                                 "/api/projects/*",
@@ -45,13 +47,13 @@ public class SecurityConfiguration {
                                 "/api/tasks")
                             .authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/**")
-                            .hasRole(roleAdmin)
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/projects/**",
                                 "/api/tasks/**")
                             .authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**")
-                            .hasRole(roleAdmin)
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/projects",
                                 "/api/tasks/**")
