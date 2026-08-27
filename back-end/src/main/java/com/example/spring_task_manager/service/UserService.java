@@ -2,6 +2,7 @@ package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.AssignedUser;
+import com.example.spring_task_manager.entity.SecurityUser;
 import com.example.spring_task_manager.exceptions.UserAlreadyExistsInDataBase;
 import com.example.spring_task_manager.exceptions.UserNotFoundException;
 import com.example.spring_task_manager.repository.UserRepository;
@@ -72,6 +73,6 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return getUserByEmail(email);
+        return new SecurityUser(getUserByEmail(email));
     }
 }

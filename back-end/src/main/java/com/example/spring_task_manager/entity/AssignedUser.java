@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class AssignedUser implements UserDetails, CredentialsContainer {
+public class AssignedUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,19 +45,8 @@ public class AssignedUser implements UserDetails, CredentialsContainer {
         this.password = password;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(getPosition());
-    }
-
-    @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return getEmail();
     }
 
     public Long getId() {
@@ -110,11 +99,5 @@ public class AssignedUser implements UserDetails, CredentialsContainer {
 
     public void setProject(Project project) {
         this.project = project;
-    }
-
-
-    @Override
-    public void eraseCredentials() {
-        this.password = null;
     }
 }
