@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class AssignedUser implements UserDetails {
+public class AssignedUser implements UserDetails, CredentialsContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -113,4 +113,8 @@ public class AssignedUser implements UserDetails {
     }
 
 
+    @Override
+    public void eraseCredentials() {
+        this.password = null;
+    }
 }
