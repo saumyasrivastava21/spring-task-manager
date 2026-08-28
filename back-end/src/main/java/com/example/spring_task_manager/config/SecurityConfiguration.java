@@ -34,9 +34,11 @@ public class SecurityConfiguration {
                                 "/api/tasks")
                             .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users")
-                            .hasAuthority(roleManager.getAuthority())
+//                            .hasAuthority(roleManager.getAuthority())
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users")
-                            .hasAuthority(roleManager.getAuthority())
+//                            .hasAuthority(roleManager.getAuthority())
+                            .permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/users/*",
                                 "/api/projects/*",
@@ -60,6 +62,8 @@ public class SecurityConfiguration {
                             .authenticated()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth -> oauth
+                        .jwt(Customizer.withDefaults()))
                 .build();
     }
 
@@ -67,5 +71,6 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(16);
     }
+
 
 }
