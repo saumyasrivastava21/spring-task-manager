@@ -13,12 +13,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 @EnableWebSecurity
@@ -42,8 +45,7 @@ public class SecurityConfiguration {
                                 "/api/tasks")
                             .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users")
-//                            .hasAuthority(roleManager.getAuthority())
-                        .permitAll()
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST, "/api/users")
                             .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST,
@@ -68,7 +70,11 @@ public class SecurityConfiguration {
                                 "/api/tasks/**")
                             .authenticated()
                         .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(oidcUserService())
+                        )
+                )
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)))
                 .build();
@@ -84,13 +90,9 @@ public class SecurityConfiguration {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
 
-            if (realmAccess == null) {
-                return Collections.emptyList();
-            }
 
-            List<String> roles = (List<String>) realmAccess.get("roles");
+            List<String> roles = jwt.getClaimAsStringList("auth_roles");
 
             if (roles == null) {
                 return Collections.emptyList();
@@ -104,6 +106,27 @@ public class SecurityConfiguration {
         return converter;
     }
 
+    @Bean
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        return userRequest -> {
+            OidcUserService delegate = new OidcUserService();
+            OidcUser oidcUser = delegate.loadUser(userRequest);
 
+            Set<GrantedAuthority> authorities =
+                    new HashSet<>(oidcUser.getAuthorities());
 
+            List<String> authRoles = oidcUser.getClaimAsStringList("auth_roles");
+            if (authRoles != null) {
+                authRoles.stream()
+                        .map(role -> new SimpleGrantedAuthority(role))
+                        .forEach(authorities::add);
+            }
+
+            return new DefaultOidcUser(
+                    authorities,
+                    oidcUser.getIdToken(),
+                    oidcUser.getUserInfo()
+            );
+        };
+    }
 }
