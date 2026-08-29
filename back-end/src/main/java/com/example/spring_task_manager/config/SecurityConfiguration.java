@@ -9,9 +9,16 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -23,7 +30,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         var roleManager = Position.MANAGER;
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -37,8 +45,7 @@ public class SecurityConfiguration {
 //                            .hasAuthority(roleManager.getAuthority())
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users")
-//                            .hasAuthority(roleManager.getAuthority())
-                            .permitAll()
+                            .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/users/*",
                                 "/api/projects/*",
@@ -63,7 +70,7 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth -> oauth
-                        .jwt(Customizer.withDefaults()))
+                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)))
                 .build();
     }
 
@@ -71,6 +78,32 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(16);
     }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+
+            if (realmAccess == null) {
+                return Collections.emptyList();
+            }
+
+            List<String> roles = (List<String>) realmAccess.get("roles");
+
+            if (roles == null) {
+                return Collections.emptyList();
+            }
+
+            return roles.stream()
+                    .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role))
+                    .toList();
+        });
+
+        return converter;
+    }
+
 
 
 }
