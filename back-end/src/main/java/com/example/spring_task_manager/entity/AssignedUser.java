@@ -22,9 +22,6 @@ public class AssignedUser {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
-
     @Enumerated(EnumType.STRING)
     private Position position;
 
@@ -38,16 +35,12 @@ public class AssignedUser {
     protected AssignedUser() {
     }
 
-    public AssignedUser(String firstName, String password, String email, Position position) {
+    public AssignedUser(String firstName, String email, Position position) {
         this.firstName = firstName;
         this.email = email;
         this.position = position;
-        this.password = password;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
     public Long getId() {
         return id;
@@ -91,10 +84,6 @@ public class AssignedUser {
 
     public Project getProject() {
         return project;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void setProject(Project project) {

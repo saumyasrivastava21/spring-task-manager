@@ -5,9 +5,9 @@ import com.example.spring_task_manager.entity.Position;
 
 import java.util.List;
 
-public record UserDTO(String firstName, String password, String email, Position position){
+public record UserDTO(String firstName, String email, Position position){
 
     public static UserDTO from(AssignedUser assignedUser) {
-        return new UserDTO(assignedUser.getFirstName(), assignedUser.getPassword(), assignedUser.getEmail(), assignedUser.getPosition());
+        return new UserDTO(assignedUser.getFirstName(), assignedUser.getEmail(), assignedUser.getPosition());
     }
 };
