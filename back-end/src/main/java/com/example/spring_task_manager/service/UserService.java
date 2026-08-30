@@ -47,7 +47,6 @@ public class UserService {
         }
         var newAssignedUser =
                 new AssignedUser(assignedUser.keycloakId(), assignedUser.email(), assignedUser.position());
-        System.out.println(assignedUser.keycloakId());
         return UserDTO.from(userRepository.save(newAssignedUser));
     }
     public void createAllUsers(List<UserDTO> users) {

@@ -38,6 +38,7 @@ public class SecurityConfiguration {
         var roleManager = Position.MANAGER;
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET,

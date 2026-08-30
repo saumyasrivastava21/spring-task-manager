@@ -28,7 +28,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity<String> createNewUser(@RequestBody RegisterRequest user) {
         String keycloakUserId = keycloakService.createUser(user);
-        System.out.println("KeyCloakUserId: " + keycloakUserId);
         var newUser = userService.createUser(new UserDTO(keycloakUserId, user.email(), Position.valueOf(user.position())));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
