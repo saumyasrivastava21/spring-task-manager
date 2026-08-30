@@ -1,12 +1,7 @@
 package com.example.spring_task_manager.entity;
 
 import jakarta.persistence.*;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.core.CredentialsContainer;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -16,14 +11,14 @@ public class AssignedUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String firstName;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String keycloakId;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Enumerated(EnumType.STRING)
     private Position position;
@@ -38,15 +33,18 @@ public class AssignedUser {
     protected AssignedUser() {
     }
 
-    public AssignedUser(String firstName, String password, String email, Position position) {
-        this.firstName = firstName;
+    public AssignedUser(String keycloakId, String email, Position position) {
+        this.keycloakId = keycloakId;
         this.email = email;
         this.position = position;
-        this.password = password;
     }
 
-    public String getPassword() {
-        return password;
+    public String getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(String keycloakId) {
+        this.keycloakId = keycloakId;
     }
 
     public Long getId() {
@@ -91,10 +89,6 @@ public class AssignedUser {
 
     public Project getProject() {
         return project;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void setProject(Project project) {

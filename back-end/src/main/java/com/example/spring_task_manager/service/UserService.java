@@ -2,27 +2,21 @@ package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.AssignedUser;
-import com.example.spring_task_manager.entity.SecurityUser;
 import com.example.spring_task_manager.exceptions.UserAlreadyExistsInDataBase;
 import com.example.spring_task_manager.exceptions.UserNotFoundException;
 import com.example.spring_task_manager.repository.UserRepository;
-import org.apache.catalina.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -51,11 +45,9 @@ public class UserService implements UserDetailsService {
                     String.format("User with this email {%s} already exists in database.",
                             assignedUser.email()));
         }
-
         var newAssignedUser =
-                new AssignedUser(assignedUser.firstName(), passwordEncoder.encode(assignedUser.password()),
-                        assignedUser.email(), assignedUser.position());
-
+                new AssignedUser(assignedUser.keycloakId(), assignedUser.email(), assignedUser.position());
+        System.out.println(assignedUser.keycloakId());
         return UserDTO.from(userRepository.save(newAssignedUser));
     }
     public void createAllUsers(List<UserDTO> users) {
@@ -65,14 +57,8 @@ public class UserService implements UserDetailsService {
         var entityFromDB = getUserById(id);
 
         entityFromDB.setEmail(assignedUser.email());
-        entityFromDB.setFirstName(assignedUser.firstName());
         entityFromDB.setPosition(assignedUser.position());
 
         return UserDTO.from(userRepository.save(entityFromDB));
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return new SecurityUser(getUserByEmail(email));
     }
 }

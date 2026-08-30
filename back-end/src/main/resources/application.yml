@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: spring-task-manager
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project_manager
+    driver-class-name: org.postgresql.Driver
+    username: oleksandrparfesa
+    password: password
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/task-manager
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8081/realms/task-manager
+
+        registration:
+          keycloak:
+            client-id: task-manager-backend
+            client-secret: ${client_secret}
+            scope:
+              - openid
