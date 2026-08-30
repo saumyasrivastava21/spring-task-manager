@@ -46,9 +46,8 @@ public class UserService {
                             assignedUser.email()));
         }
         var newAssignedUser =
-                new AssignedUser(assignedUser.firstName(),
-                        assignedUser.email(), assignedUser.position());
-
+                new AssignedUser(assignedUser.keycloakId(), assignedUser.email(), assignedUser.position());
+        System.out.println(assignedUser.keycloakId());
         return UserDTO.from(userRepository.save(newAssignedUser));
     }
     public void createAllUsers(List<UserDTO> users) {
@@ -58,7 +57,6 @@ public class UserService {
         var entityFromDB = getUserById(id);
 
         entityFromDB.setEmail(assignedUser.email());
-        entityFromDB.setFirstName(assignedUser.firstName());
         entityFromDB.setPosition(assignedUser.position());
 
         return UserDTO.from(userRepository.save(entityFromDB));

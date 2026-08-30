@@ -1,12 +1,7 @@
 package com.example.spring_task_manager.entity;
 
 import jakarta.persistence.*;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.core.CredentialsContainer;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -16,8 +11,11 @@ public class AssignedUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String firstName;
+
+    @Column(nullable = false, unique = true)
+    private String keycloakId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -35,12 +33,19 @@ public class AssignedUser {
     protected AssignedUser() {
     }
 
-    public AssignedUser(String firstName, String email, Position position) {
-        this.firstName = firstName;
+    public AssignedUser(String keycloakId, String email, Position position) {
+        this.keycloakId = keycloakId;
         this.email = email;
         this.position = position;
     }
 
+    public String getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(String keycloakId) {
+        this.keycloakId = keycloakId;
+    }
 
     public Long getId() {
         return id;
