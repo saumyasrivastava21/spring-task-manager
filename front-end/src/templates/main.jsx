@@ -4,8 +4,10 @@ import '../styles/index.css'
 import MainPage from './MainPage'
 import Tasks from './Tasks'
 import ProjectPage from './ProjectPage'
+import LoginPage from "./LoginPage"
+import RegistrationPage from "./Registration"
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <MainPage/>
+    <RegistrationPage/>
   </StrictMode>,
 )
