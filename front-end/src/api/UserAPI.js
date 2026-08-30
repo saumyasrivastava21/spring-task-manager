@@ -12,3 +12,7 @@ export async function getAllTasks() {
     const response = await axios.get("http://localhost:8080/api/tasks")
     return response.data;
 }
+export async function createNewUser(newUser) {
+    const response = await axios.post("http://localhost:8080/api/users", newUser)
+    return response.data;
+}

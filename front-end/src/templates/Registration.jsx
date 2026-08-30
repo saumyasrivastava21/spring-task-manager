@@ -1,12 +1,14 @@
 import { useState } from 'react'
-
+import {createNewUser} from '../api/UserApi'
 import "../styles/login.scss"
 import Header from "./Header.jsx"
+
+
 export default function Registration() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [repeatPassword, setRepeatPassword] = useState("")
-
+    const [position, setPosition] = useState("MANAGER")
 
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
 
@@ -19,13 +21,30 @@ export default function Registration() {
         setRepeatPassword(e.target.value);
     }
 
+
+    const submitForm = async (e) => {
+        e.preventDefault();
+
+        const newUser = {
+            email,
+            password,
+            position
+        }
+
+        try {
+            const user = await createNewUser(newUser);
+            console.log("Created user:", user);
+        } catch (error) {
+            console.error("Failed to create user:", error);
+        }
+    }
     return (
         <>
             <Header/>
             <div className="container">
-                <h1>Authorization</h1>
+                <h1>Registration</h1>
                 <div className="login-form">
-                    <form action="/" method="POST">
+                    <form action="/" method="POST" onSubmit={submitForm}>
                         <input type="email" 
                                 placeholder="Email:"
                                 className="email-field field"
@@ -36,14 +55,14 @@ export default function Registration() {
                                 className="password-field field"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)} />
-                        <input type="text" 
+                        <input type="password" 
                                 placeholder="Password:"
                                 className="password-field field"
                                 value={repeatPassword}
                                 onChange={e => verifyPassword(e)} />
                         <input type="submit"
                                 className="send-request-btn btn"
-                                value="Login"
+                                value="Registrate"
                                 disabled={!isPasswordCorrect}/>
                     </form>
                 </div>
