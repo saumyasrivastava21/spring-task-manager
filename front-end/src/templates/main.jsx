@@ -6,20 +6,26 @@ import Tasks from './Tasks'
 import ProjectPage from './ProjectPage'
 import LoginPage from "./LoginPage"
 import RegistrationPage from "./Registration"
-import {useEffect} from 'react'
+import {useEffect, useState} from 'react'
 import keycloak from "../api/KeycloakConfiguration";
 
 import { BrowserRouter, Routes, Route } from 'react-router';
 
 function App() {
+    const [initialized, setInitialized] = useState(false);
+
     useEffect(() => {
         keycloak.init({
-            onLoad: "check-sso",
-            pkceMethod: "S256"
+            onLoad: "login-required",
         }).then(authenticated => {
-            console.log("Authenticated:", authenticated);
+
+            setInitialized(true);
         });
     }, []);
+
+    if (!initialized) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <StrictMode>
@@ -27,7 +33,7 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/home" element={<MainPage />} />
-                </Routes>            
+                </Routes>
             </BrowserRouter>
         </StrictMode>
     );
