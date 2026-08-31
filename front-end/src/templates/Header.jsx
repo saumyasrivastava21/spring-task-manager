@@ -7,7 +7,9 @@ export default function Header() {
                 <div id="app-name">Task manager</div>
                 <div className="menu-container">
                     <ul className="menu">
-                        <li className="menu-item">Entities</li>
+                        <a href="/home">
+                            <li className="menu-item">Entities</li>
+                        </a>
                         <li className="menu-item">Project</li>
                     </ul>
                 </div>

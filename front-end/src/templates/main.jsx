@@ -9,6 +9,8 @@ import RegistrationPage from "./Registration"
 import {useEffect} from 'react'
 import keycloak from "../api/KeycloakConfiguration";
 
+import { BrowserRouter, Routes, Route } from 'react-router';
+
 function App() {
     useEffect(() => {
         keycloak.init({
@@ -21,11 +23,16 @@ function App() {
 
     return (
         <StrictMode>
-            <LoginPage />
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/home" element={<MainPage />} />
+                </Routes>            
+            </BrowserRouter>
         </StrictMode>
     );
 }
 
 createRoot(document.getElementById('root')).render(
-    <App />
+        <App />
 );
