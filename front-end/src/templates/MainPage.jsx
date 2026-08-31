@@ -4,6 +4,8 @@ import Header from "./Header"
 import { getAllUsers, getAllProjects, getAllTasks } from "../api/UserAPI"
 import getTableNames from "../api/AvailableTablesAPI"
 import DataTable from "./DataTable"
+import keycloak from "../api/KeycloakConfiguration";
+
 export default function MainPage() {
     const [entityName, setEntityName] = useState("")
     const [entities, setEntities] = useState([])
