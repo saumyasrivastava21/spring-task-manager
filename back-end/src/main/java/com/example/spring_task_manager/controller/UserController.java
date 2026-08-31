@@ -2,8 +2,6 @@ package com.example.spring_task_manager.controller;
 
 import com.example.spring_task_manager.dto.RegisterRequest;
 import com.example.spring_task_manager.dto.UserDTO;
-import com.example.spring_task_manager.entity.Position;
-import com.example.spring_task_manager.service.KeycloakService;
 import com.example.spring_task_manager.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +14,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final KeycloakService keycloakService;
-    public UserController(UserService userService, KeycloakService keycloakService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.keycloakService = keycloakService;
     }
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -27,14 +23,13 @@ public class UserController {
     }
     @PostMapping
     public ResponseEntity<String> createNewUser(@RequestBody RegisterRequest user) {
-        String keycloakUserId = keycloakService.createUser(user);
-        var newUser = userService.createUser(new UserDTO(keycloakUserId, user.email(), Position.valueOf(user.position())));
+        var newUser = userService.createUser(user);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(String.format("User with email %s was created", user.email()));
     }
     @PostMapping("/all")
-    public ResponseEntity<Void> createAllUsers(@RequestBody List<UserDTO> users) {
+    public ResponseEntity<Void> createAllUsers(@RequestBody List<RegisterRequest> users) {
         userService.createAllUsers(users);
         return ResponseEntity.ok().build();
     }

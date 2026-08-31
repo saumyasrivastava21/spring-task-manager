@@ -1,12 +1,14 @@
 package com.example.spring_task_manager.service;
 
+import com.example.spring_task_manager.dto.RegisterRequest;
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.AssignedUser;
+import com.example.spring_task_manager.entity.Position;
 import com.example.spring_task_manager.exceptions.UserAlreadyExistsInDataBase;
 import com.example.spring_task_manager.exceptions.UserNotFoundException;
 import com.example.spring_task_manager.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,9 +16,10 @@ import java.util.List;
 public class UserService {
 
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    public UserService(UserRepository userRepository) {
+    private KeycloakService keycloakService;
+    public UserService(UserRepository userRepository, KeycloakService keycloakService) {
         this.userRepository = userRepository;
+        this.keycloakService = keycloakService;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -39,17 +42,27 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
-    public UserDTO createUser(UserDTO assignedUser) {
-        if (userRepository.existsByEmail(assignedUser.email())) {
-            throw new UserAlreadyExistsInDataBase(
-                    String.format("User with this email {%s} already exists in database.",
-                            assignedUser.email()));
+    @Transactional
+    public UserDTO createUser(RegisterRequest assignedUser) {
+
+        String keycloakUserId = keycloakService.createUser(assignedUser);
+        AssignedUser newUser = null;
+        try {
+            if (userRepository.existsByEmail(assignedUser.email())) {
+                throw new UserAlreadyExistsInDataBase(
+                        String.format("User with this email {%s} already exists in database.",
+                                assignedUser.email()));
+            }
+            var newAssignedUser =
+                    new AssignedUser(keycloakUserId, assignedUser.email(), Position.valueOf(assignedUser.position()));
+            newUser = userRepository.save(newAssignedUser);
+        } catch (Exception e) {
+            keycloakService.deleteUser(keycloakUserId);
+            System.out.println(e.getStackTrace());
         }
-        var newAssignedUser =
-                new AssignedUser(assignedUser.keycloakId(), assignedUser.email(), assignedUser.position());
-        return UserDTO.from(userRepository.save(newAssignedUser));
+        return UserDTO.from(newUser);
     }
-    public void createAllUsers(List<UserDTO> users) {
+    public void createAllUsers(List<RegisterRequest> users) {
         users.forEach(this::createUser);
     }
     public UserDTO updateUser(UserDTO assignedUser, Long id) {

@@ -58,4 +58,12 @@ public class KeycloakService {
 
         return keycloakUserId;
     }
+
+    public void deleteUser(String keycloakUserId) {
+        keycloak
+                .realm("task-manager")
+                .users()
+                .delete(keycloakUserId)
+                .close();
+    }
 }
