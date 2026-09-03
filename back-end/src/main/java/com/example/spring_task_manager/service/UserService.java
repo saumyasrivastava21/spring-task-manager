@@ -58,7 +58,7 @@ public class UserService {
             newUser = userRepository.save(newAssignedUser);
         } catch (Exception e) {
             keycloakService.deleteUser(keycloakUserId);
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
         return UserDTO.from(newUser);
     }
@@ -72,5 +72,14 @@ public class UserService {
         entityFromDB.setPosition(assignedUser.position());
 
         return UserDTO.from(userRepository.save(entityFromDB));
+    }
+
+    public List<UserDTO> getUserPage(Long pageNumber, Long sizeOfPage) {
+        var onePage = userRepository.findOneAssignedUsersPage(pageNumber, sizeOfPage);
+
+        return onePage.stream()
+                .map(UserDTO::from)
+                .toList();
+
     }
 }

@@ -1,6 +1,7 @@
 package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.TaskDTO;
+import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.entity.Task;
 import com.example.spring_task_manager.exceptions.TaskAlreadyExists;
@@ -69,5 +70,13 @@ public class TaskService {
 
         task.setAssignedUser(user);
         taskRepository.save(task);
+    }
+
+    public List<TaskDTO> getTaskPage(Long pageNumber, Long sizeOfPage) {
+        var onePage = taskRepository.findOneTasksPage(pageNumber, sizeOfPage);
+
+        return onePage.stream()
+                .map(TaskDTO::from)
+                .toList();
     }
 }

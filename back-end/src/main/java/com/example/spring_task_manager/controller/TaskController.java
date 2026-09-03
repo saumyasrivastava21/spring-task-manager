@@ -1,6 +1,7 @@
 package com.example.spring_task_manager.controller;
 
 import com.example.spring_task_manager.dto.TaskDTO;
+import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,12 @@ public class TaskController {
         return ResponseEntity.ok(
                 String.format("User with id:%d was assigned to task with id:%d", userId, id)
         );
+    }
+    @GetMapping("/paging")
+    public List<TaskDTO> getUserPage(@RequestParam(name = "page") Long pageNumber,
+                                     @RequestParam(name = "size") Long sizeOfPage) {
+
+        return taskService.getTaskPage(pageNumber, sizeOfPage);
     }
 
 }
