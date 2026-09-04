@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO user) {
         return ResponseEntity.ok().body(userService.updateUser(user, id));
     }
-    @GetMapping("/paging")
+    @GetMapping("/")
     public ResponsePage<UserDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
                                              @RequestParam(name = "size") Long sizeOfPage) {
 

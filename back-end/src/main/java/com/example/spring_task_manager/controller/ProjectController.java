@@ -59,7 +59,7 @@ public class ProjectController {
         projectService.addNewTask(id, taskId);
         return ResponseEntity.ok(String.format("New task with id:%d to project was added", taskId));
     }
-    @GetMapping("/paging")
+    @GetMapping("/")
     public ResponsePage<ProjectDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
                                     @RequestParam(name = "size") Long sizeOfPage) {
 

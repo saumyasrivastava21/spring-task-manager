@@ -64,7 +64,7 @@ public class TaskController {
                 String.format("User with id:%d was assigned to task with id:%d", userId, id)
         );
     }
-    @GetMapping("/paging")
+    @GetMapping("/")
     public ResponsePage<TaskDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
                                     @RequestParam(name = "size") Long sizeOfPage) {
 
