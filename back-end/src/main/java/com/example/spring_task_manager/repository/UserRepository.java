@@ -17,11 +17,12 @@ public interface UserRepository extends JpaRepository<AssignedUser, Long> {
     @Query(value =
             """
             SELECT * FROM users
-            WHERE id >= (:pageNumber * :sizeOfPage) AND id < ((:pageNumber + 1) * :sizeOfPage)
-            ORDER BY id ASC;
+            WHERE :cursor IS NULL or id > :cursor
+            ORDER BY id ASC
+            LIMIT :sizeOfPage;
             """,
             nativeQuery = true
     )
-    List<AssignedUser> findOneAssignedUsersPage(@Param("pageNumber") Long pageNumber,
+    List<AssignedUser> fetchPage(@Param("cursor") Long cursor,
                                                 @Param("sizeOfPage") Long sizeOfPage);
 }

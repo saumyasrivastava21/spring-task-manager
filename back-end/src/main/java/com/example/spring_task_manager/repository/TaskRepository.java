@@ -16,11 +16,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query(value =
             """
             SELECT * FROM task
-            WHERE id >= (:pageNumber * :sizeOfPage) AND id < ((:pageNumber + 1) * :sizeOfPage)
-            ORDER BY id ASC;
+            WHERE :cursor IS NULL or id > :cursor
+            ORDER BY id ASC
+            LIMIT :sizeOfPage;
             """,
             nativeQuery = true
     )
-    List<Task> findOneTasksPage(@Param("pageNumber") Long pageNumber,
+    List<Task> fetchPage(@Param("cursor") Long cursor,
                                 @Param("sizeOfPage") Long sizeOfPage);
 }

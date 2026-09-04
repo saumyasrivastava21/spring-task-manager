@@ -10,7 +10,8 @@ export default function MainPage() {
     const [entityName, setEntityName] = useState("")
     const [entities, setEntities] = useState([])
     const [dataTable, setDataTable] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentCursor, setCurrentCursor] = useState(null);
+    const [hasNext, setHasNext] = useState(false);
     useEffect(() => {
         getTableNames()
             .then(data => {
@@ -24,11 +25,11 @@ export default function MainPage() {
         let loadData;
 
         if (entityName === "Users") {
-            loadData = () => fetchOnePageOfUsers(currentPage);
+            loadData = () => fetchOnePageOfUsers(currentCursor);
         } else if (entityName === "Projects") {
-            loadData = () => fetchOnePageOfProject(currentPage);
+            loadData = () => fetchOnePageOfProject(currentCursor);
         } else if (entityName === "Tasks") {
-            loadData = () => fetchOnePageOfTask(currentPage);
+            loadData = () => fetchOnePageOfTask(currentCursor);
         }
 
         if (!loadData) {
@@ -38,7 +39,9 @@ export default function MainPage() {
 
         loadData()
             .then(data => {
-                setDataTable(data);
+                setDataTable(data.data);
+                setCurrentCursor(data.nextCursor);
+                setHasNext(data.hasNext)
             })
             .catch(error => {
                 console.error(error);
@@ -47,26 +50,30 @@ export default function MainPage() {
     }, [entityName]);
 
     const loadNextDataPage = async () => {
-        const nextPage = currentPage + 1;
-        setCurrentPage(nextPage);
 
-        if (entityName === "Users") {
-            const fetchedData = await fetchOnePageOfUsers(nextPage)
-            if (fetchedData.length > 0) {
-                setDataTable(fetchedData);
+        if (entityName === "Users" && hasNext) {
+            const fetchedData = await fetchOnePageOfUsers(currentCursor)
+            if (fetchedData.data !== null && fetchedData.data.length > 0) {
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
             }
         }
-        if (entityName === "Projects") {
-            const fetchedData = await fetchOnePageOfProject(nextPage)
+        if (entityName === "Projects" && hasNext) {
+            const fetchedData = await fetchOnePageOfProject(currentCursor)
             if (fetchedData.length > 0) {
-                setDataTable(fetchedData);
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
             }
         }
         
-        if (entityName === "Tasks") {
-            const fetchedData = await fetchOnePageOfTask(nextPage)
+        if (entityName === "Tasks" && hasNext) {
+            const fetchedData = await fetchOnePageOfTask(currentCursor)
             if (fetchedData.length > 0) {
-                setDataTable(fetchedData);
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
             }
         }
     }

@@ -29,11 +29,11 @@ export async function createNewUser(newUser) {
     const response = await axios.post("http://localhost:8080/api/users", newUser)
     return response.data;
 }
-export async function fetchOnePageOfUsers(page) {
+export async function fetchOnePageOfUsers(cursor) {
     const response = await axios.get("http://localhost:8080/api/users/paging", {
         params: {
-            page: page,
-            size: 3
+            cursor: cursor,
+            size: 2
         },
         headers: {
             Authorization: `Bearer ${keycloak.token}` 
@@ -41,10 +41,10 @@ export async function fetchOnePageOfUsers(page) {
     });
     return response.data;
 }
-export async function fetchOnePageOfProject(page) {
+export async function fetchOnePageOfProject(cursor) {
     const response = await axios.get("http://localhost:8080/api/projects/paging", {
         params: {
-            page: page,
+            page: cursor,
             size: 3
         },
         headers: {
@@ -53,10 +53,10 @@ export async function fetchOnePageOfProject(page) {
     });
     return response.data;
 }
-export async function fetchOnePageOfTask(page) {
+export async function fetchOnePageOfTask(cursor) {
     const response = await axios.get("http://localhost:8080/api/tasks/paging", {
         params: {
-            page: page,
+            page: cursor,
             size: 3
         },
         headers: {

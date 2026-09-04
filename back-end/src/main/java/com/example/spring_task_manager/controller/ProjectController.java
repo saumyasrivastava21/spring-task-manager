@@ -2,6 +2,7 @@ package com.example.spring_task_manager.controller;
 
 import com.example.spring_task_manager.dto.ProjectDTO;
 import com.example.spring_task_manager.dto.ProjectDTOCreateRequest;
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +60,9 @@ public class ProjectController {
         return ResponseEntity.ok(String.format("New task with id:%d to project was added", taskId));
     }
     @GetMapping("/paging")
-    public List<ProjectDTO> getUserPage(@RequestParam(name = "page") Long pageNumber,
-                                     @RequestParam(name = "size") Long sizeOfPage) {
+    public ResponsePage<ProjectDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
+                                    @RequestParam(name = "size") Long sizeOfPage) {
 
-        return projectService.getProjectPage(pageNumber, sizeOfPage);
+        return projectService.getProjectPage(cursor, sizeOfPage);
     }
 }

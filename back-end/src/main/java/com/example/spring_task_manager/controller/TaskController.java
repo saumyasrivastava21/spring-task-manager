@@ -1,5 +1,6 @@
 package com.example.spring_task_manager.controller;
 
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.TaskDTO;
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.Status;
@@ -64,10 +65,10 @@ public class TaskController {
         );
     }
     @GetMapping("/paging")
-    public List<TaskDTO> getUserPage(@RequestParam(name = "page") Long pageNumber,
-                                     @RequestParam(name = "size") Long sizeOfPage) {
+    public ResponsePage<TaskDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
+                                    @RequestParam(name = "size") Long sizeOfPage) {
 
-        return taskService.getTaskPage(pageNumber, sizeOfPage);
+        return taskService.getTaskPage(cursor, sizeOfPage);
     }
 
 }

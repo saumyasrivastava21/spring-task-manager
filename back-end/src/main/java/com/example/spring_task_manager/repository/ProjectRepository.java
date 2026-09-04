@@ -18,11 +18,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value =
             """
             SELECT * FROM project
-            WHERE id >= (:pageNumber * :sizeOfPage) AND id < ((:pageNumber + 1) * :sizeOfPage)
-            ORDER BY id ASC;
+            WHERE :cursor IS NULL or id > :cursor
+            ORDER BY id ASC
+            LIMIT :sizeOfPage;
             """,
             nativeQuery = true
     )
-    List<Project> findOneProjectPage(@Param("pageNumber") Long pageNumber,
+    List<Project> fetchData(@Param("cursor") Long cursor,
                                      @Param("sizeOfPage") Long sizeOfPage);
 }
