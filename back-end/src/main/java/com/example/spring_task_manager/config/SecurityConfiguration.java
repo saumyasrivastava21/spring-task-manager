@@ -43,9 +43,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET,
                                 "/api/projects",
-                                "/api/tasks")
+                                "/api/tasks/**")
                             .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*")
                             .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST, "/api/users")
                             .hasAuthority(roleManager.getAuthority())

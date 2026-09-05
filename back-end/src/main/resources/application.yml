@@ -29,3 +29,8 @@ spring:
             client-secret: ${client_secret}
             scope:
               - openid
+logging:
+  level:
+    org:
+      springframework:
+        web: debug

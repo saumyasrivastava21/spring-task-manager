@@ -1,9 +1,11 @@
 package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.RegisterRequest;
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.AssignedUser;
 import com.example.spring_task_manager.entity.Position;
+import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.exceptions.UserAlreadyExistsInDataBase;
 import com.example.spring_task_manager.exceptions.UserNotFoundException;
 import com.example.spring_task_manager.repository.UserRepository;
@@ -58,7 +60,7 @@ public class UserService {
             newUser = userRepository.save(newAssignedUser);
         } catch (Exception e) {
             keycloakService.deleteUser(keycloakUserId);
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
         return UserDTO.from(newUser);
     }
@@ -72,5 +74,18 @@ public class UserService {
         entityFromDB.setPosition(assignedUser.position());
 
         return UserDTO.from(userRepository.save(entityFromDB));
+    }
+
+    public ResponsePage<UserDTO> getUserPage(Long cursor, Long sizeOfPage) {
+        var data = userRepository.fetchPage(cursor, sizeOfPage);
+        boolean hasNext = data.size() == sizeOfPage;
+        Long nextCursor = hasNext ? data.get(data.size() - 1).getId() : null;
+
+        var dataDTO = data.stream()
+                .map(UserDTO::from)
+                .toList();
+
+        return new ResponsePage<>(dataDTO, nextCursor, hasNext, sizeOfPage);
+
     }
 }

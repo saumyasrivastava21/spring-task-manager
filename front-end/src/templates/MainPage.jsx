@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/mainPage.scss'
 import Header from "./Header"
-import { getAllUsers, getAllProjects, getAllTasks } from "../api/UserAPI"
+import { getAllUsers, getAllProjects, getAllTasks, fetchOnePageOfUsers, fetchOnePageOfProject, fetchOnePageOfTask } from "../api/UserAPI"
 import getTableNames from "../api/AvailableTablesAPI"
 import DataTable from "./DataTable"
 import keycloak from "../api/KeycloakConfiguration";
@@ -10,7 +10,8 @@ export default function MainPage() {
     const [entityName, setEntityName] = useState("")
     const [entities, setEntities] = useState([])
     const [dataTable, setDataTable] = useState([]);
-
+    const [currentCursor, setCurrentCursor] = useState(null);
+    const [hasNext, setHasNext] = useState(false);
     useEffect(() => {
         getTableNames()
             .then(data => {
@@ -24,11 +25,11 @@ export default function MainPage() {
         let loadData;
 
         if (entityName === "Users") {
-            loadData = getAllUsers;
+            loadData = () => fetchOnePageOfUsers(currentCursor);
         } else if (entityName === "Projects") {
-            loadData = getAllProjects;
+            loadData = () => fetchOnePageOfProject(currentCursor);
         } else if (entityName === "Tasks") {
-            loadData = getAllTasks;
+            loadData = () => fetchOnePageOfTask(currentCursor);
         }
 
         if (!loadData) {
@@ -38,13 +39,44 @@ export default function MainPage() {
 
         loadData()
             .then(data => {
-                setDataTable(data);
+                setDataTable(data.data);
+                setCurrentCursor(data.nextCursor);
+                setHasNext(data.hasNext)
             })
             .catch(error => {
                 console.error(error);
             });
 
     }, [entityName]);
+
+    const loadNextDataPage = async () => {
+
+        if (entityName === "Users" && hasNext) {
+            const fetchedData = await fetchOnePageOfUsers(currentCursor)
+            if (fetchedData.data !== null && fetchedData.data.length > 0) {
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
+            }
+        }
+        if (entityName === "Projects" && hasNext) {
+            const fetchedData = await fetchOnePageOfProject(currentCursor)
+            if (fetchedData.length > 0) {
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
+            }
+        }
+        
+        if (entityName === "Tasks" && hasNext) {
+            const fetchedData = await fetchOnePageOfTask(currentCursor)
+            if (fetchedData.length > 0) {
+                setDataTable(fetchedData.data);
+                setCurrentCursor(fetchedData.nextCursor)
+                setHasNext(fetchedData.hasNext)
+            }
+        }
+    }
 
     const choseTableToLoad = (e => {
         setEntityName(e.target.value);
@@ -76,6 +108,7 @@ export default function MainPage() {
                         <h1>{entityName === "" ? "Entity name" : entityName}</h1>
                         {entityName !== "" && <DataTable data={dataTable}/>}
                     </div>
+                    <button onClick={loadNextDataPage}>NEXT PAGE</button>
                 </div>
             </div>
         </div>

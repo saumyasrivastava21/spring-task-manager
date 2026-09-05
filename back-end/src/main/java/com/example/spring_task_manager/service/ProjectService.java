@@ -2,6 +2,8 @@ package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.ProjectDTO;
 import com.example.spring_task_manager.dto.ProjectDTOCreateRequest;
+import com.example.spring_task_manager.dto.ResponsePage;
+import com.example.spring_task_manager.dto.TaskDTO;
 import com.example.spring_task_manager.entity.Project;
 import com.example.spring_task_manager.exceptions.EmptyFetchedResults;
 import com.example.spring_task_manager.exceptions.ProjectAlreadyExists;
@@ -82,4 +84,14 @@ public class ProjectService {
         return ProjectDTO.from(projectRepository.save(project));
     }
 
+    public ResponsePage<ProjectDTO> getProjectPage(Long cursor, Long sizeOfPage) {
+        var data = projectRepository.fetchData(cursor, sizeOfPage);
+        boolean hasNext = data.size() == sizeOfPage;
+        Long nextCursor = hasNext ? data.get(data.size() - 1).getId() : null;
+
+        var dataDTO = data.stream()
+                .map(ProjectDTO::from)
+                .toList();
+        return new ResponsePage<>(dataDTO, nextCursor, hasNext, sizeOfPage);
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.spring_task_manager.controller;
 
 import com.example.spring_task_manager.dto.RegisterRequest;
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.UserDTO;
+import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +44,11 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO user) {
         return ResponseEntity.ok().body(userService.updateUser(user, id));
+    }
+    @GetMapping("/")
+    public ResponsePage<UserDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
+                                             @RequestParam(name = "size") Long sizeOfPage) {
+
+        return userService.getUserPage(cursor, sizeOfPage);
     }
 }

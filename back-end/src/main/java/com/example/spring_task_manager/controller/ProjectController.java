@@ -2,10 +2,7 @@ package com.example.spring_task_manager.controller;
 
 import com.example.spring_task_manager.dto.ProjectDTO;
 import com.example.spring_task_manager.dto.ProjectDTOCreateRequest;
-import com.example.spring_task_manager.dto.TaskDTO;
-import com.example.spring_task_manager.dto.UserDTO;
-import com.example.spring_task_manager.entity.AssignedUser;
-import com.example.spring_task_manager.entity.Task;
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,5 +58,11 @@ public class ProjectController {
     public ResponseEntity<String> addNewTask(@PathVariable Long id, @RequestParam Long taskId) {
         projectService.addNewTask(id, taskId);
         return ResponseEntity.ok(String.format("New task with id:%d to project was added", taskId));
+    }
+    @GetMapping("/")
+    public ResponsePage<ProjectDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
+                                    @RequestParam(name = "size") Long sizeOfPage) {
+
+        return projectService.getProjectPage(cursor, sizeOfPage);
     }
 }

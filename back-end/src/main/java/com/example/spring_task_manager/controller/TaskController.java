@@ -1,12 +1,17 @@
 package com.example.spring_task_manager.controller;
 
+import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.TaskDTO;
+import com.example.spring_task_manager.dto.UserDTO;
+import com.example.spring_task_manager.entity.Priority;
 import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.service.TaskService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,7 +25,30 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<TaskDTO> getAllTasks() {
+    public List<TaskDTO> getAllTasks(@RequestParam(name = "status", required = false) Status status,
+                                     @RequestParam(name = "beforeDate", required = false)
+                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                     LocalDateTime before,
+                                     @RequestParam(name = "left", required = false) Integer daysLeftUntilDeadline,
+                                     @RequestParam(name = "inactiveStatus", required = false) Status inactive,
+                                     @RequestParam(name = "userId", required = false) Long userId,
+                                     @RequestParam(name = "priority", required = false) Priority priority,
+                                     @RequestParam(name = "after", required = false)
+                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                     LocalDateTime after) {
+        if (status == null && before == null && inactive == null) {
+            return taskService.getTasksNearTheirDeadline(daysLeftUntilDeadline);
+        } else if (status == null && inactive == null && after == null) {
+            return taskService.getTasksBeforeDate(before);
+        } else if (inactive != null) {
+            return taskService.getTasksThatNotInactive(inactive);
+        } else if (userId != null && before == null) {
+            return taskService.getTasksByUserIdAndStatus(userId, status);
+        } else if (priority != null) {
+            return taskService.getTasksByPriorityAndStatus(status, priority);
+        } else if (before != null && after != null && userId != null) {
+            return taskService.getTasksCompletedByUserBetweenDates(userId, after, before);
+        }
         return taskService.getAllTasks();
     }
 
@@ -61,6 +89,12 @@ public class TaskController {
         return ResponseEntity.ok(
                 String.format("User with id:%d was assigned to task with id:%d", userId, id)
         );
+    }
+    @GetMapping("/")
+    public ResponsePage<TaskDTO> getUserPage(@RequestParam(name = "cursor", required = false) Long cursor,
+                                    @RequestParam(name = "size") Long sizeOfPage) {
+
+        return taskService.getTaskPage(cursor, sizeOfPage);
     }
 
 }
