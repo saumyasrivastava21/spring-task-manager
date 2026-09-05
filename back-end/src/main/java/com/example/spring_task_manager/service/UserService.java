@@ -5,6 +5,7 @@ import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.UserDTO;
 import com.example.spring_task_manager.entity.AssignedUser;
 import com.example.spring_task_manager.entity.Position;
+import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.exceptions.UserAlreadyExistsInDataBase;
 import com.example.spring_task_manager.exceptions.UserNotFoundException;
 import com.example.spring_task_manager.repository.UserRepository;

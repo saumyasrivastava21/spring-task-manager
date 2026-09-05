@@ -3,6 +3,7 @@ package com.example.spring_task_manager.controller;
 import com.example.spring_task_manager.dto.RegisterRequest;
 import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.UserDTO;
+import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

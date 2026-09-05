@@ -2,6 +2,7 @@ package com.example.spring_task_manager.service;
 
 import com.example.spring_task_manager.dto.ResponsePage;
 import com.example.spring_task_manager.dto.TaskDTO;
+import com.example.spring_task_manager.entity.Priority;
 import com.example.spring_task_manager.entity.Status;
 import com.example.spring_task_manager.entity.Task;
 import com.example.spring_task_manager.exceptions.TaskAlreadyExists;
@@ -10,6 +11,7 @@ import com.example.spring_task_manager.repository.TaskRepository;
 import com.example.spring_task_manager.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -81,5 +83,73 @@ public class TaskService {
                 .map(TaskDTO::from)
                 .toList();
         return new ResponsePage<>(dataDTO, nextCursor, hasNext, sizeOfPage);
+    }
+
+    public List<TaskDTO> getTasksByStatus(Status status) {
+        List<Task> byStatus = taskRepository.findByStatus(status);
+
+        return byStatus.isEmpty()
+                ? List.of()
+                : byStatus
+                    .stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksBeforeDate(LocalDateTime before) {
+        var tasksBefore = taskRepository.findBeforeDate(before);
+
+        return tasksBefore.isEmpty()
+                ? List.of()
+                : tasksBefore.stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksNearTheirDeadline(Integer daysLeftUntilDeadline) {
+        var tasksNearTheyDeadLine = taskRepository.fetchTasksNearTheirDeadline(daysLeftUntilDeadline, LocalDateTime.now());
+        return tasksNearTheyDeadLine.isEmpty()
+                ? List.of()
+                : tasksNearTheyDeadLine.stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksThatNotInactive(Status inactive) {
+        var tasksThatNotInactive = taskRepository.fetchActiveTasksOrderedByDeadline(inactive.name());
+        return tasksThatNotInactive.isEmpty()
+                ? List.of()
+                : tasksThatNotInactive.stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksByUserIdAndStatus(Long userId, Status status) {
+        var tasks = taskRepository.findByAssignedUser_IdAndStatus(userId, status);
+
+        return tasks.isEmpty()
+                ? List.of()
+                : tasks.stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksByPriorityAndStatus(Status status, Priority priority) {
+        var tasks = taskRepository.findByStatusAndPriority(status, priority);
+        return tasks.isEmpty()
+                ? List.of()
+                : tasks.stream()
+                    .map(TaskDTO::from)
+                    .toList();
+    }
+
+    public List<TaskDTO> getTasksCompletedByUserBetweenDates(Long userId, LocalDateTime after, LocalDateTime before) {
+        var tasks = taskRepository.fetchCompletedTasksByUserBetweenDates(userId, after, before);
+
+        return tasks.isEmpty()
+                ? List.of()
+                : tasks.stream()
+                .map(TaskDTO::from)
+                .toList();
     }
 }
