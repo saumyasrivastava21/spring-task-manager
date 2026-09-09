@@ -47,16 +47,11 @@ public class SecurityConfiguration {
                             .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/*")
                             .hasAuthority(roleManager.getAuthority())
-                        .requestMatchers(HttpMethod.POST, "/api/users")
+                        .requestMatchers(HttpMethod.POST, "/api/users/**")
                             .hasAuthority(roleManager.getAuthority())
                         .requestMatchers(HttpMethod.POST,
-                                "/api/users/*",
-                                "/api/projects/*",
-                                "/api/tasks/*")
-                            .permitAll()
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/projects",
-                                "/api/tasks")
+                                "/api/projects/**",
+                                "/api/tasks/**")
                             .authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/**")
                             .hasAuthority(roleManager.getAuthority())
